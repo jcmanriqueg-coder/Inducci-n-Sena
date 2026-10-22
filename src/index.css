@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    color-scheme: light;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  .font-mono, code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Screen blur transition when applying dark mode */
+@keyframes screenBlurFlash {
+  0% {
+    backdrop-filter: blur(0px);
+    opacity: 0;
+  }
+  35% {
+    backdrop-filter: blur(20px);
+    opacity: 0.85;
+  }
+  70% {
+    backdrop-filter: blur(12px);
+    opacity: 0.6;
+  }
+  100% {
+    backdrop-filter: blur(0px);
+    opacity: 0;
+  }
+}
+
+.animate-screen-blur {
+  animation: screenBlurFlash 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .certificate-container {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+  }
+}
