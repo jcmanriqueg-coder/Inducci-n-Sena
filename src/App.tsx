@@ -18,7 +18,10 @@ import { useAutoGoogleSheetsSync } from './hooks/useAutoGoogleSheetsSync';
 import { InstructorDashboard } from './components/InstructorDashboard';
 import { RoleSwitchModal } from './components/RoleSwitchModal';
 import { LandingPage } from './components/LandingPage';
+import { LanguageToggle } from './components/LanguageToggle';
+import { useLanguage } from './contexts/LanguageContext';
 import {
+
   getStoredProfile,
   saveStoredProfile,
   getStoredProgress,
@@ -36,7 +39,9 @@ import { INDUCTION_MODULES } from './data/regulationData';
 import { RotateCcw, BookOpen, Shield, Award, LogOut } from 'lucide-react';
 
 export default function App() {
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<ApprenticeProfile>(getStoredProfile);
+
   const [progress, setProgress] = useState<UserInductionProgress>(getStoredProgress);
   const [theme, setTheme] = useState<'light' | 'dark'>(getStoredTheme);
   const [role, setRole] = useState<AppRole>(getStoredRole);
@@ -413,33 +418,41 @@ export default function App() {
                 S
               </span>
               <span className="font-semibold text-slate-700 dark:text-slate-200">
-                Servicio Nacional de Aprendizaje · SENA
+                {t('footer.sena')}
               </span>
               <span>·</span>
-              <span>Reglamento del Aprendiz (Acuerdo 009 de 2024)</span>
+              <span>{t('footer.country')}</span>
+              <span>·</span>
+              <span>{t('footer.agreement')}</span>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <LanguageToggle variant="compact" />
+
               <button
                 onClick={handleExitToLanding}
-                className="text-slate-600 dark:text-slate-300 hover:text-[#39A900] dark:hover:text-[#39A900] transition-colors flex items-center gap-1.5 font-semibold"
-                title="Cambiar entre perfil de Aprendiz e Instructor en la Portada"
+                className="text-slate-600 dark:text-slate-300 hover:text-[#39A900] dark:hover:text-[#39A900] transition-colors flex items-center gap-1.5 font-semibold cursor-pointer"
+                title={t('nav.role_switch_title')}
               >
                 <Shield className="w-3.5 h-3.5 text-[#39A900]" />
-                <span>Rol: {role === 'instructor' ? 'Instructor (Cambiar / Salir)' : 'Aprendiz (Cambiar / Salir)'}</span>
+                <span>
+                  {t('footer.role_label')}{' '}
+                  {role === 'instructor'
+                    ? `${t('nav.role_instructor')} (${t('nav.role_switch_title')})`
+                    : `${t('nav.role_learner')} (${t('nav.role_switch_title')})`}
+                </span>
               </button>
-              <span>·</span>
-              <span>Formación Profesional Integral</span>
+
               {role === 'instructor' && (
                 <>
                   <span>·</span>
                   <button
                     onClick={handleResetProgress}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors flex items-center gap-1"
-                    title="Reiniciar progreso para pruebas"
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors flex items-center gap-1 cursor-pointer"
+                    title={t('footer.reset')}
                   >
                     <RotateCcw className="w-3 h-3" />
-                    <span>Reiniciar inducción</span>
+                    <span>{t('footer.reset')}</span>
                   </button>
                 </>
               )}
@@ -447,6 +460,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

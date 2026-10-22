@@ -60,7 +60,38 @@ export function saveStoredTheme(theme: 'light' | 'dark'): void {
   }
 }
 
+const LANGUAGE_KEY = 'sena_app_language_v1';
+
+export type AppLanguage = 'es' | 'en';
+
+export function getStoredLanguage(): AppLanguage {
+  try {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryLang = urlParams.get('lang') || urlParams.get('idioma');
+      if (queryLang === 'en' || queryLang === 'es') {
+        saveStoredLanguage(queryLang);
+        return queryLang;
+      }
+    }
+    const raw = localStorage.getItem(LANGUAGE_KEY);
+    if (raw === 'en' || raw === 'es') return raw;
+  } catch (e) {
+    console.error('Error reading language', e);
+  }
+  return 'es';
+}
+
+export function saveStoredLanguage(lang: AppLanguage): void {
+  try {
+    localStorage.setItem(LANGUAGE_KEY, lang);
+  } catch (e) {
+    console.error('Error saving language', e);
+  }
+}
+
 export const DEFAULT_PROFILE: ApprenticeProfile = {
+
   fullName: 'Juan Camilo Gómez Manrique',
   documentType: 'CC',
   documentNumber: '1098765432',

@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { Shield, User, KeyRound, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
 import { AppRole } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface RoleSwitchModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
   currentRole,
   onSelectRole,
 }) => {
+  const { t } = useLanguage();
   const [pinInput, setPinInput] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
       setErrorMsg(null);
       onClose();
     } else {
-      setErrorMsg('Clave de acceso incorrecta. (Clave autorizada: Sena1234)');
+      setErrorMsg(t('role_modal.pin_error'));
     }
   };
 
@@ -53,19 +55,19 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-[#39A900]" />
             <h2 className="font-bold text-slate-900 dark:text-white text-base">
-              Seleccionar Rol en la Plataforma
+              {t('role_modal.title')}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold p-1 text-sm"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold p-1 text-sm cursor-pointer"
           >
             ✕
           </button>
         </div>
 
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          El prototipo cuenta con dos pantallas independientes: la vista del <strong>Aprendiz</strong> para realizar la inducción y el portal del <strong>Instructor</strong> para realizar seguimiento y configurar Google Drive.
+          {t('role_modal.desc')}
         </p>
 
         {/* Opción Aprendiz */}
@@ -84,16 +86,16 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
               </div>
               <div>
                 <h3 className="font-bold text-xs text-slate-900 dark:text-white">
-                  Rol Aprendiz (Inducción Oficial)
+                  {t('role_modal.learner_title')}
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Ruta de formación, simulador de casos éticos y evaluación final
+                  {t('role_modal.learner_desc')}
                 </p>
               </div>
             </div>
             {currentRole === 'aprendiz' && (
               <span className="text-[10px] font-bold text-[#39A900] px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/60 rounded">
-                Activo
+                {t('role_modal.active')}
               </span>
             )}
           </div>
@@ -114,17 +116,17 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
               </div>
               <div>
                 <h3 className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <span>Rol Instructor (Panel de Control)</span>
+                  <span>{t('role_modal.instructor_title')}</span>
                   <Lock className="w-3 h-3 text-slate-400" />
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Seguimiento de aprendices, Google Sheets y enlace para compartir
+                  {t('role_modal.instructor_desc')}
                 </p>
               </div>
             </div>
             {currentRole === 'instructor' && (
               <span className="text-[10px] font-bold text-[#39A900] px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/60 rounded">
-                Activo
+                {t('role_modal.active')}
               </span>
             )}
           </div>
@@ -132,12 +134,12 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
           {currentRole !== 'instructor' ? (
             <form onSubmit={handleSelectInstructor} className="space-y-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <label className="text-[11px] font-medium text-slate-600 dark:text-slate-400 block">
-                Ingresa la clave de instructor para acceder:
+                {t('role_modal.pin_label')}
               </label>
               <div className="flex gap-2">
                 <input
                   type="password"
-                  placeholder="Clave (Sena1234)"
+                  placeholder={t('role_modal.pin_ph')}
                   value={pinInput}
                   onChange={(e) => {
                     setPinInput(e.target.value);
@@ -147,9 +149,9 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
                 />
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#39A900] hover:bg-[#329600] text-white text-xs font-semibold rounded-lg transition-colors"
+                  className="px-4 py-1.5 bg-[#39A900] hover:bg-[#329600] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
-                  Entrar
+                  {t('role_modal.pin_submit')}
                 </button>
               </div>
               {errorMsg && (
@@ -161,7 +163,7 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
             </form>
           ) : (
             <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-1">
-              Actualmente tienes acceso a todos los privilegios de configuración y seguimiento.
+              {t('role_modal.instructor_notice')}
             </p>
           )}
         </div>
@@ -169,9 +171,9 @@ export const RoleSwitchModal: React.FC<RoleSwitchModalProps> = ({
         <div className="pt-2">
           <button
             onClick={onClose}
-            className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition-colors"
+            className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
           >
-            Cerrar
+            {t('role_modal.close')}
           </button>
         </div>
       </div>

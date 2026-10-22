@@ -35,6 +35,7 @@ import { ApprenticeProfile, UserInductionProgress, InstructorApprenticeRecord } 
 import { UseAutoGoogleSheetsSyncReturn } from '../hooks/useAutoGoogleSheetsSync';
 import { fetchApprenticesFromSheet, getGoogleAccessToken } from '../utils/googleSheets';
 import { getAllApprenticeRecords } from '../utils/storage';
+import { useLanguage } from '../contexts/LanguageContext';
 
 
 interface InstructorDashboardProps {
@@ -52,6 +53,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   onSwitchToLearnerView,
   onOpenGoogleSyncModal,
 }) => {
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'monitoring' | 'config' | 'sharing'>('monitoring');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'certified' | 'in_progress'>('all');
@@ -71,8 +73,11 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
   // Invitation template for instructors to send to students
   const inviteMessage = useMemo(() => {
+    if (language === 'en') {
+      return `*OFFICIAL SENA INDUCTION 2025*\nDear apprentices, here is the official link to complete the Apprentice Regulations Induction (Agreement 009 of 2024):\n\n🔗 *Link:* ${apprenticeLink}\n\n*Instructions:*\n1. Access the link and fill out your cohort profile in 'My Profile'.\n2. Complete all 6 interactive modules and resolve the simulator cases.\n3. Take the final evaluation and download your official certificate.\n\nYour progress is tracked automatically in the background. Best wishes in your vocational training!`;
+    }
     return `*INDUCCIÓN OFICIAL SENA 2025*\nEstimados aprendices, les comparto el enlace oficial para realizar la inducción del Reglamento del Aprendiz (Acuerdo 009 de 2024):\n\n🔗 *Enlace:* ${apprenticeLink}\n\n*Instrucciones:*\n1. Ingresen y completen sus datos en 'Mi Ficha'.\n2. Realicen los 6 módulos interactivos y resuelvan los casos del simulador.\n3. Presenten la evaluación final y descarguen su certificado oficial.\n\nSu avance se registrará de forma automática. ¡Muchos éxitos en su formación profesional!`;
-  }, [apprenticeLink]);
+  }, [apprenticeLink, language]);
 
   // Load learners from Google Sheets if connected, or fallback to current student session
   const loadLearnersFromSheet = async () => {
@@ -258,36 +263,36 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-md bg-[#39A900] text-white text-[11px] font-bold tracking-wider uppercase">
-                Panel del Instructor
+                {t('instructor.badge')}
               </span>
               <span className="text-xs text-slate-300">
-                SENA · Centro de Formación y Seguimiento
+                {t('instructor.center_title')}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Control y Seguimiento de Inducción
+              {t('instructor.main_title')}
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl">
-              Monitorea en tiempo real el cumplimiento del Reglamento del Aprendiz (Acuerdo 009 de 2024), administra la hoja de Google Drive y comparte el enlace directo para tus grupos de formación.
+              {t('instructor.main_desc')}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleCopyLink}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-bold transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-bold transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
             >
               {copiedLink ? <Check className="w-4 h-4 text-[#39A900]" /> : <Share2 className="w-4 h-4 text-[#39A900]" />}
-              <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar Enlace para Aprendices'}</span>
+              <span>{copiedLink ? t('instructor.copied_link_btn') : t('instructor.copy_link_btn')}</span>
             </button>
 
             <button
               onClick={onSwitchToLearnerView}
-              className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-100 border border-slate-600 rounded-xl text-xs font-semibold transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-100 border border-slate-600 rounded-xl text-xs font-semibold transition-all cursor-pointer"
               title="Abrir la plataforma tal como la ven los aprendices"
             >
               <Eye className="w-4 h-4 text-[#39A900]" />
-              <span>Ver como Aprendiz</span>
+              <span>{t('instructor.view_as_learner')}</span>
             </button>
           </div>
         </div>
@@ -296,51 +301,51 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-700/80">
           <div className="bg-white/5 backdrop-blur-xs rounded-xl p-3.5 border border-white/10">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Aprendices</span>
+              <span>{t('instructor.metric_learners')}</span>
               <Users className="w-4 h-4 text-[#39A900]" />
             </div>
             <div className="text-2xl font-bold font-mono tabular-nums text-white">
               {totalCount}
             </div>
-            <div className="text-[11px] text-slate-400 mt-0.5">En seguimiento</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">{t('instructor.metric_tracking')}</div>
           </div>
 
           <div className="bg-white/5 backdrop-blur-xs rounded-xl p-3.5 border border-white/10">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Certificados</span>
+              <span>{t('instructor.metric_certified')}</span>
               <Award className="w-4 h-4 text-amber-400" />
             </div>
             <div className="text-2xl font-bold font-mono tabular-nums text-white">
               {certifiedCount}
             </div>
             <div className="text-[11px] text-emerald-400 mt-0.5 font-medium">
-              {certificationRate}% completitud
+              {t('instructor.metric_completion', { rate: certificationRate })}
             </div>
           </div>
 
           <div className="bg-white/5 backdrop-blur-xs rounded-xl p-3.5 border border-white/10">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Hojas en Drive</span>
+              <span>{t('instructor.metric_sheets')}</span>
               <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             </div>
             <div className="text-sm font-semibold text-white truncate">
-              {cloudSync.spreadsheetUrl ? 'Conectada' : 'Pendiente'}
+              {cloudSync.spreadsheetUrl ? t('instructor.metric_connected') : t('instructor.metric_pending')}
             </div>
             <div className="text-[11px] text-slate-400 mt-1 truncate">
-              {cloudSync.spreadsheetUrl ? 'Auto-guardado activo' : 'Requiere conexión'}
+              {cloudSync.spreadsheetUrl ? t('instructor.metric_auto_active') : t('instructor.metric_needs_conn')}
             </div>
           </div>
 
           <div className="bg-white/5 backdrop-blur-xs rounded-xl p-3.5 border border-white/10">
             <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Reglamento</span>
+              <span>{t('instructor.metric_regulations')}</span>
               <BookOpen className="w-4 h-4 text-blue-400" />
             </div>
             <div className="text-sm font-semibold text-white">
-              Acuerdo 009 / 2024
+              {t('instructor.metric_reg_name')}
             </div>
             <div className="text-[11px] text-slate-400 mt-1">
-              6 Módulos interactivos
+              {t('instructor.metric_modules_count')}
             </div>
           </div>
         </div>
@@ -350,38 +355,38 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('monitoring')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
             activeTab === 'monitoring'
               ? 'bg-[#39A900] text-white shadow-xs'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>Seguimiento de Aprendices ({filteredLearners.length})</span>
+          <span>{t('instructor.tab_monitoring', { count: filteredLearners.length })}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('config')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
             activeTab === 'config'
               ? 'bg-[#39A900] text-white shadow-xs'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <FileSpreadsheet className="w-4 h-4" />
-          <span>Configuración Google Drive & Sheets</span>
+          <span>{t('instructor.tab_config')}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('sharing')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
             activeTab === 'sharing'
               ? 'bg-[#39A900] text-white shadow-xs'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
           <Share2 className="w-4 h-4" />
-          <span>Compartir Enlace con Grupos</span>
+          <span>{t('instructor.tab_sharing')}</span>
         </button>
       </div>
 
@@ -394,7 +399,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
               <input
                 type="text"
-                placeholder="Buscar por nombre, documento, número de ficha o regional..."
+                placeholder={t('instructor.search_ph')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#39A900]"
@@ -405,40 +410,40 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 text-xs">
                 <button
                   onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                     statusFilter === 'all'
                       ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                   }`}
                 >
-                  Todos
+                  {t('instructor.filter_all')}
                 </button>
                 <button
                   onClick={() => setStatusFilter('certified')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                     statusFilter === 'certified'
                       ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                   }`}
                 >
-                  Certificados
+                  {t('instructor.filter_certified')}
                 </button>
                 <button
                   onClick={() => setStatusFilter('in_progress')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
                     statusFilter === 'in_progress'
                       ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                   }`}
                 >
-                  En Formación
+                  {t('instructor.filter_in_progress')}
                 </button>
               </div>
 
               <button
                 onClick={loadLearnersFromSheet}
                 disabled={isLoadingSheet}
-                className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors"
+                className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors cursor-pointer"
                 title="Actualizar datos desde Google Sheets"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoadingSheet ? 'animate-spin text-[#39A900]' : ''}`} />
@@ -446,11 +451,11 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
               <button
                 onClick={handleExportCSV}
-                className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
                 title="Descargar reporte en formato CSV"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Exportar CSV</span>
+                <span className="hidden sm:inline">{t('instructor.export_csv')}</span>
               </button>
             </div>
           </div>
@@ -461,21 +466,21 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    <th className="py-3 px-4">Aprendiz</th>
-                    <th className="py-3 px-4">Documento</th>
-                    <th className="py-3 px-4">Ficha y Programa</th>
-                    <th className="py-3 px-4">Módulos</th>
-                    <th className="py-3 px-4">Casos</th>
-                    <th className="py-3 px-4">Nota Examen</th>
-                    <th className="py-3 px-4">Estado</th>
-                    <th className="py-3 px-4 text-right">Detalle</th>
+                    <th className="py-3 px-4">{t('instructor.th_apprentice')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_document')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_ficha')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_modules')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_cases')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_score')}</th>
+                    <th className="py-3 px-4">{t('instructor.th_status')}</th>
+                    <th className="py-3 px-4 text-right">{t('instructor.th_detail')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                   {filteredLearners.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-12 text-center text-slate-400">
-                        No se encontraron aprendices con el filtro actual.
+                        {t('instructor.no_learners_found')}
                       </td>
                     </tr>
                   ) : (
@@ -521,7 +526,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
                           <td className="py-3.5 px-4 whitespace-nowrap font-mono tabular-nums">
                             {learner.finalExamScore === 'Pendiente' ? (
-                              <span className="text-slate-400 text-[11px]">Pendiente</span>
+                              <span className="text-slate-400 text-[11px]">{t('instructor.score_pending')}</span>
                             ) : (
                               <span
                                 className={`font-bold ${
@@ -544,16 +549,16 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                               }`}
                             >
                               {isCert && <CheckCircle2 className="w-3 h-3 text-[#39A900]" />}
-                              {isCert ? 'Certificado' : 'En Formación'}
+                              {isCert ? t('instructor.status_certified') : t('instructor.status_in_progress')}
                             </span>
                           </td>
 
                           <td className="py-3.5 px-4 text-right">
                             <button
                               onClick={() => setSelectedLearner(learner)}
-                              className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline font-medium text-xs"
+                              className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline font-medium text-xs cursor-pointer"
                             >
-                              Ver Ficha
+                              {t('instructor.btn_view_file')}
                             </button>
                           </td>
                         </tr>
@@ -566,7 +571,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
             {/* Pie de tabla con datos */}
             <div className="py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-              <span>Mostrando {filteredLearners.length} de {learnersList.length} aprendices</span>
+              <span>{t('instructor.showing_count', { filtered: filteredLearners.length, total: learnersList.length })}</span>
               {cloudSync.spreadsheetUrl && (
                 <a
                   href={cloudSync.spreadsheetUrl}
@@ -575,7 +580,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   className="text-[#39A900] hover:underline flex items-center gap-1 font-semibold"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Ver hoja en Google Sheets</span>
+                  <span>{t('instructor.open_in_sheets')}</span>
                 </a>
               )}
             </div>
@@ -595,10 +600,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                      Hoja de Cálculo en Google Drive
+                      {t('instructor.config_drive_title')}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Libro oficial donde se consolidan todos los registros de los aprendices
+                      {t('instructor.config_drive_desc')}
                     </p>
                   </div>
                 </div>
@@ -610,30 +615,30 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                       : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
                   }`}
                 >
-                  {cloudSync.spreadsheetUrl ? 'Vinculado' : 'Sin vincular'}
+                  {cloudSync.spreadsheetUrl ? t('instructor.status_linked') : t('instructor.status_unlinked')}
                 </span>
               </div>
 
               <div className="space-y-4 text-xs">
                 <div>
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                    Cuenta Google del Instructor
+                    {t('instructor.google_account')}
                   </label>
                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                    <span>{cloudSync.userEmail || 'Ninguna cuenta conectada'}</span>
+                    <span>{cloudSync.userEmail || t('instructor.no_account')}</span>
                     {!cloudSync.userEmail ? (
                       <button
                         onClick={cloudSync.connectGoogleAccount}
-                        className="px-3 py-1 bg-[#39A900] hover:bg-[#329200] text-white rounded-md font-semibold text-xs transition-colors"
+                        className="px-3 py-1 bg-[#39A900] hover:bg-[#329200] text-white rounded-md font-semibold text-xs transition-colors cursor-pointer"
                       >
-                        Iniciar Sesión con Google
+                        {t('instructor.login_google')}
                       </button>
                     ) : (
                       <button
                         onClick={cloudSync.disconnectGoogleAccount}
-                        className="text-xs text-rose-500 hover:underline"
+                        className="text-xs text-rose-500 hover:underline cursor-pointer"
                       >
-                        Desconectar
+                        {t('instructor.disconnect_google')}
                       </button>
                     )}
                   </div>
@@ -641,11 +646,11 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
                 <div>
                   <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                    Enlace de la Hoja de Cálculo
+                    {t('instructor.sheet_link')}
                   </label>
                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
                     <span className="truncate text-slate-600 dark:text-slate-400 font-mono text-[11px]">
-                      {cloudSync.spreadsheetUrl || 'No se ha creado la hoja todavía'}
+                      {cloudSync.spreadsheetUrl || t('instructor.no_sheet_yet')}
                     </span>
                     {cloudSync.spreadsheetUrl && (
                       <a
@@ -655,7 +660,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                         className="flex items-center gap-1 px-3 py-1 bg-[#39A900] text-white rounded-md font-semibold text-xs whitespace-nowrap hover:bg-[#329600] transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
-                        <span>Abrir en Drive</span>
+                        <span>{t('instructor.open_in_drive')}</span>
                       </a>
                     )}
                   </div>
@@ -664,16 +669,16 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                 <div className="pt-2 flex items-center gap-3">
                   <button
                     onClick={onOpenGoogleSyncModal}
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold text-slate-800 dark:text-slate-200 transition-colors"
+                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold text-slate-800 dark:text-slate-200 transition-colors cursor-pointer"
                   >
-                    Abrir Asistente Completo de Sincronización
+                    {t('instructor.open_sync_wizard')}
                   </button>
                   <button
                     onClick={cloudSync.forceSync}
                     disabled={cloudSync.syncState === 'syncing'}
-                    className="px-4 py-2 bg-[#39A900] hover:bg-[#329600] text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-[#39A900] hover:bg-[#329600] text-white rounded-lg font-semibold transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {cloudSync.syncState === 'syncing' ? 'Sincronizando...' : 'Forzar Sincronización'}
+                    {cloudSync.syncState === 'syncing' ? t('instructor.syncing') : t('instructor.force_sync')}
                   </button>
                 </div>
               </div>
@@ -682,10 +687,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             {/* Estructura de Columnas */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2">
-                Estructura de la Hoja en Google Drive
+                {t('instructor.drive_structure_title')}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                El sistema inserta o actualiza automáticamente las siguientes 16 columnas con los datos institucionales del SENA:
+                {t('instructor.drive_structure_desc')}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
                 {[
@@ -722,22 +727,22 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60 p-5">
               <div className="flex items-center gap-2 text-[#39A900] dark:text-emerald-400 font-bold text-xs mb-2">
                 <Shield className="w-4 h-4" />
-                <span>Privilegios Exclusivos del Instructor</span>
+                <span>{t('instructor.privileges_title')}</span>
               </div>
               <ul className="text-xs text-slate-700 dark:text-slate-300 space-y-2 list-disc pl-4">
-                <li>Solo tú como instructor puedes ver la lista completa de aprendices.</li>
-                <li>Solo el instructor puede vincular o cambiar la hoja de cálculo de Google Drive.</li>
-                <li>Los aprendices NO ven botones de Google Drive ni pueden modificar datos de otros estudiantes.</li>
-                <li>Los aprendices únicamente ven su propio progreso y certificado.</li>
+                <li>{t('instructor.privilege_1')}</li>
+                <li>{t('instructor.privilege_2')}</li>
+                <li>{t('instructor.privilege_3')}</li>
+                <li>{t('instructor.privilege_4')}</li>
               </ul>
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 text-xs text-slate-600 dark:text-slate-400">
               <h4 className="font-bold text-slate-900 dark:text-white mb-2">
-                ¿Cómo funciona el guardado de los aprendices?
+                {t('instructor.how_saving_works_title')}
               </h4>
               <p className="leading-relaxed">
-                Cuando un aprendiz recorre un módulo o aprueba la evaluación, el prototipo realiza un <strong>upsert silencioso</strong>: si el aprendiz ya tenía una fila registrada con su número de documento, se actualiza; si es nuevo, se añade una nueva fila automáticamente.
+                {t('instructor.how_saving_works_desc')}
               </p>
             </div>
           </div>
@@ -750,10 +755,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Enlace Directo para Aprendices
+                {t('instructor.share_direct_title')}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Comparte este enlace con tus aprendices para que ingresen directamente a su ruta de inducción sin ver las opciones de configuración ni el panel del instructor.
+                {t('instructor.share_direct_desc')}
               </p>
             </div>
 
@@ -766,10 +771,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               />
               <button
                 onClick={handleCopyLink}
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#39A900] hover:bg-[#329600] text-white rounded-lg text-xs font-bold transition-colors shrink-0 shadow-xs"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#39A900] hover:bg-[#329600] text-white rounded-lg text-xs font-bold transition-colors shrink-0 shadow-xs cursor-pointer"
               >
                 {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                <span>{copiedLink ? 'Copiado' : 'Copiar'}</span>
+                <span>{copiedLink ? t('instructor.copied') : t('instructor.copy')}</span>
               </button>
             </div>
           </div>
@@ -778,19 +783,19 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Plantilla de Mensaje para Difusión (WhatsApp / Teams / Correo)
+                  {t('instructor.share_template_title')}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Copia este mensaje listo para enviar a tus grupos de formación.
+                  {t('instructor.share_template_desc')}
                 </p>
               </div>
 
               <button
                 onClick={handleCopyMessage}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
               >
                 {copiedMessage ? <Check className="w-3.5 h-3.5 text-[#39A900]" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedMessage ? 'Mensaje Copiado' : 'Copiar Texto'}</span>
+                <span>{copiedMessage ? t('instructor.message_copied') : t('instructor.copy_text')}</span>
               </button>
             </div>
 
@@ -821,7 +826,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               </div>
               <button
                 onClick={() => setSelectedLearner(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-semibold p-1"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm font-semibold p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -830,25 +835,25 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             <div className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Programa</span>
+                  <span className="text-slate-400 block text-[10px]">{t('instructor.modal_program')}</span>
                   <span className="font-medium text-slate-800 dark:text-slate-200">
                     {selectedLearner.programaFormacion}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Número de Ficha</span>
+                  <span className="text-slate-400 block text-[10px]">{t('instructor.modal_ficha')}</span>
                   <span className="font-medium text-slate-800 dark:text-slate-200">
                     {selectedLearner.numeroFicha}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Regional</span>
+                  <span className="text-slate-400 block text-[10px]">{t('instructor.modal_regional')}</span>
                   <span className="font-medium text-slate-800 dark:text-slate-200">
                     {selectedLearner.regional}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
-                  <span className="text-slate-400 block text-[10px]">Nota Examen Final</span>
+                  <span className="text-slate-400 block text-[10px]">{t('instructor.modal_score')}</span>
                   <span className="font-bold text-[#39A900] text-sm">
                     {selectedLearner.finalExamScore}
                   </span>
@@ -857,19 +862,19 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
               <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Módulos:</span>
+                  <span className="text-slate-400">{t('instructor.modal_modules')}</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedLearner.completedModules}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Casos del Simulador:</span>
+                  <span className="text-slate-400">{t('instructor.modal_cases')}</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedLearner.completedScenarios}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Código de Certificado:</span>
+                  <span className="text-slate-400">{t('instructor.modal_cert_code')}</span>
                   <span className="font-mono text-[11px] font-bold text-[#00324D] dark:text-emerald-400">{selectedLearner.certificateCode}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Fecha de Registro:</span>
+                  <span className="text-slate-400">{t('instructor.modal_reg_date')}</span>
                   <span className="text-slate-600 dark:text-slate-400">{selectedLearner.timestamp}</span>
                 </div>
               </div>
@@ -878,9 +883,9 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             <div className="pt-2">
               <button
                 onClick={() => setSelectedLearner(null)}
-                className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-lg transition-colors"
+                className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
               >
-                Cerrar
+                {t('common.close')}
               </button>
             </div>
           </div>
